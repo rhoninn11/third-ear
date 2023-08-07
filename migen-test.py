@@ -1,10 +1,32 @@
 from migen import *
-from migen.build.platforms import m1
-from migen.build.platforms import cmoda7
-plat = m1.Platform()
-led = plat.request("user_led")
-m = Module()
-counter = Signal(26)
-m.comb += led.eq(counter[25])
-m.sync += counter.eq(counter + 1)
-plat.build(m)
+from migen.fhdl import verilog
+from cmod import Platform
+from migen.sim.core import run_simulation
+
+platform = Platform()
+led = platform.request("user_led")
+
+class Blinker(Module):
+    def __init__(self, led, maxperiod):
+        self.counter = Signal(max=maxperiod+1)
+        period = Signal(max=maxperiod+1)
+        self.comb += period.eq(maxperiod)
+        self.sync += If(
+            self.counter == 0,
+                led.eq(~led),
+                self.counter.eq(period)
+                    ).Else(
+                self.counter.eq(self.counter - 1))
+        
+
+
+led = Signal()
+my_blinker = Blinker(led, 100000000)
+
+dut = my_blinker
+def testbanch()
+# print(verilog.convert(my_blinker, ios={led}))
+
+# platform.build(my_blinker)
+run_simulation(my_blinker, ncycles=200, vcd_name="ledblinker.vcd")
+
