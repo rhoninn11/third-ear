@@ -1,7 +1,7 @@
 import migen as mg
 
 class PWMGenerator(mg.Module):
-    def __init__(self, pwm_value, width=10):
+    def __init__(self, pwm_value, pwm_out, width=10):
         # Wejście: wartość PWM od 0 do 1023
         self.pwm_value = mg.Signal(width)
         max_value = (1 << width) - 1
@@ -13,6 +13,7 @@ class PWMGenerator(mg.Module):
 
         # Logika synchroniczna
         self.comb += self.pwm_value.eq(pwm_value)
+        self.comb += pwm_out.eq(self.pwm_value)
 
         pwm_logic = mg.If(counter <= self.pwm_value,
                 self.pwm_out.eq(1)
